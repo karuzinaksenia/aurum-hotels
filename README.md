@@ -1,16 +1,92 @@
-# React + Vite
+# Aurum Hotels
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Трёхстраничное SPA для бронирования отелей (курсовой проект).
 
-Currently, two official plugins are available:
+| Страница | Маршрут | Фича |
+|----------|---------|------|
+| Поиск отелей | `/` | Поиск и фильтрация через REST API |
+| Детали отеля | `/hotel/:id` | Форма бронирования → API + localStorage |
+| Мои брони | `/bookings` | Список и отмена бронирований |
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Стек (требования курса)
 
-## React Compiler
+- **SPA:** React 18 + Vite + React Router (3 экрана)
+- **REST API:** Express + MongoDB (Mongoose)
+- **State:** Redux Toolkit
+- **Стили:** Emotion (`@emotion/react`, `@emotion/styled`)
+- **localStorage:** кэш броней, недавние поиски
+- **a11y:** семантическая разметка, skip-link, labels, `aria-*`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Структура
 
-## Expanding the ESLint configuration
+```
+src/
+  components/     # UI-kit и layout (отдельные .jsx + .styles.js)
+  pages/          # Страницы собирают подкомпоненты из components/
+  store/          # Redux slices
+  services/       # api.js, storage.js
+  styles/         # theme, GlobalStyles
+server/           # Express + MongoDB
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Локальный запуск
+
+1. Установите MongoDB (Docker):
+
+```bash
+docker run -d --name mongo -p 27017:27017 mongo:7
+```
+
+2. Скопируйте переменные:
+
+```bash
+cp .env.example .env
+```
+
+3. Установка и запуск (клиент + API):
+
+```bash
+npm install
+npm run dev
+```
+
+- Сайт: http://localhost:5173  
+- API: http://localhost:3001/api/health  
+
+## Деплой на GitHub + Render (не localhost)
+
+1. Создайте репозиторий на GitHub и запушьте проект:
+
+```bash
+git init
+git add .
+git commit -m "Aurum Hotels SPA"
+git remote add origin https://github.com/YOUR_USER/aurum-hotels.git
+git push -u origin main
+```
+
+2. [MongoDB Atlas](https://www.mongodb.com/atlas) — бесплатный кластер, скопируйте connection string.
+
+3. [Render](https://render.com) → **New Blueprint** → подключите репозиторий → используйте `render.yaml`.
+
+4. В Render задайте переменные:
+   - **API** `aurum-hotels-api`: `MONGODB_URI`, `CLIENT_ORIGIN` = URL статики (например `https://aurum-hotels-web.onrender.com`)
+   - **Web** `aurum-hotels-web`: `VITE_API_URL` = `https://aurum-hotels-api.onrender.com/api`
+
+5. После деплоя откройте URL статического сервиса — это публичный адрес для сдачи.
+
+## API
+
+| Method | Endpoint | Описание |
+|--------|----------|----------|
+| GET | `/api/hotels` | Список (`?q`, `?city`, `?maxPrice`) |
+| GET | `/api/hotels/:id` | Отель |
+| GET | `/api/bookings` | Брони |
+| POST | `/api/bookings` | Создать бронь |
+| DELETE | `/api/bookings/:id` | Отменить |
+
+## Скрипты
+
+- `npm run dev` — фронт + бэкенд
+- `npm run build` — сборка SPA
+- `npm start` — только API (production)

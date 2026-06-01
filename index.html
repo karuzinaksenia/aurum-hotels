@@ -1,13 +1,44 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>aurum-hotels</title>
+    <meta
+      name="description"
+      content="Aurum Hotels — поиск и бронирование отелей онлайн"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Playfair+Display:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <title>Aurum Hotels — бронирование отелей</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #070b14;
+        color: #e8edf7;
+      }
+      #root {
+        min-height: 100vh;
+      }
+      #boot-error {
+        display: none;
+        padding: 24px;
+        font-family: system-ui, sans-serif;
+        color: #fca5a5;
+        max-width: 640px;
+        margin: 40px auto;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
+    <pre id="boot-error" role="alert"></pre>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

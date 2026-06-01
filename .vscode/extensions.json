@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "mongodb.mongodb-vscode",
+    "styled-components.vscode-styled-components",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense"
+  ]
+}

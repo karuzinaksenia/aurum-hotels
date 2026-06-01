@@ -1,0 +1,25 @@
+# Deploy on https://render.com (connect GitHub repo)
+services:
+  - type: web
+    name: aurum-hotels-api
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: CLIENT_ORIGIN
+        sync: false
+
+  - type: web
+    name: aurum-hotels-web
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
