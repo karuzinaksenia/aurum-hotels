@@ -30,8 +30,10 @@ src/
   store/          # Redux slices
   services/       # api.js, storage.js
   styles/         # theme, GlobalStyles
-server/           # Express + MongoDB
-render.yaml       # Blueprint для Render (API + static web)
+server/           # Express (app.js) + MongoDB
+api/              # Vercel serverless entry (export app)
+vercel.json       # SPA + /api rewrites
+render.yaml       # Blueprint для Render (опционально)
 ```
 
 ## Локальный запуск
@@ -75,6 +77,29 @@ npm run dev
 5. Публичная ссылка для сдачи — URL статического сервиса, например `https://aurum-hotels-web.onrender.com`.
 
 Подробный пошаговый чеклист (Atlas + Render + порядок env) — в документации к деплою в чате / у преподавателя.
+
+## Деплой на Vercel (фронт + API, Hobby, без карты)
+
+Один проект: статика из `dist`, Express — serverless-функция `api/index.js`. Запросы к API идут на тот же домен (`/api/...`), отдельный Render/Koyeb не нужен.
+
+1. **MongoDB Atlas** — M0, строка подключения в `MONGODB_URI` (Network Access: `0.0.0.0/0` для Vercel).
+
+2. **GitHub** — запушьте репозиторий с `vercel.json`, `api/index.js`, `server/app.js`.
+
+3. **Vercel** → Add New Project → Import репозитория → Framework Preset: **Vite** (или Other, если подхватит `vercel.json`).
+
+4. **Environment Variables** (Production и Preview):
+
+   | Переменная | Значение |
+   |------------|----------|
+   | `MONGODB_URI` | `mongodb+srv://...` из Atlas |
+   | `JWT_SECRET` | длинный случайный ключ (≥32 символа) |
+   | `CLIENT_ORIGIN` | URL продакшена, напр. `https://aurum-hotels.vercel.app` (для CORS с credentials; preview `*.vercel.app` разрешены автоматически) |
+   | `VITE_API_URL` | необязательно: `/api` (по умолчанию в `src/services/api.js`) |
+
+5. Deploy. Проверка: `https://<ваш-домен>/api/health` → `{"status":"ok",...}`; сайт открывается по корню.
+
+Локально по-прежнему: `npm run dev` (Vite proxy `/api` → `localhost:3001`).
 
 ## API
 
