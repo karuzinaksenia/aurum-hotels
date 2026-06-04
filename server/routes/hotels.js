@@ -1,22 +1,36 @@
 import { Router } from "express";
 import mongoose from "mongoose";
-import { Hotel } from "../models/Hotel.js";
+import { Hotel, MEAL_PLANS } from "../models/Hotel.js";
 
 const router = Router();
 
 function buildBaseFilter(query = {}) {
   const filter = {};
   if (query.country) filter.country = query.country;
+  if (query.meal) filter.mealPlan = query.meal;
   return filter;
+}
+
+function buildSearchOptions(countries, cities) {
+  const options = [{ value: "", label: "Все", type: "all" }];
+  for (const country of countries) {
+    options.push({ value: `country:${country}`, label: country, type: "country" });
+  }
+  for (const city of cities) {
+    options.push({ value: `city:${city}`, label: city, type: "city" });
+  }
+  return options;
 }
 
 router.get("/meta", async (req, res, next) => {
   try {
     const baseFilter = buildBaseFilter(req.query);
 
-    const [countries, cities, priceRange] = await Promise.all([
+    const [countries, cities, hotelNames, priceRange, mealPlansInDb] =
+      await Promise.all([
       Hotel.distinct("country"),
       Hotel.distinct("city", baseFilter),
+      Hotel.distinct("name", baseFilter),
       Hotel.aggregate([
         { $match: baseFilter },
         {
@@ -27,11 +41,20 @@ router.get("/meta", async (req, res, next) => {
           },
         },
       ]),
+      Hotel.distinct("mealPlan", baseFilter),
     ]);
 
+    const sortedCountries = countries.sort();
+    const sortedCities = cities.sort();
+    const sortedHotelNames = hotelNames.sort();
+    const meals = MEAL_PLANS.filter((m) => mealPlansInDb.includes(m));
+
     res.json({
-      countries: countries.sort(),
-      cities: cities.sort(),
+      countries: sortedCountries,
+      cities: sortedCities,
+      hotelNames: sortedHotelNames,
+      meals,
+      searchOptions: buildSearchOptions(sortedCountries, sortedCities),
       minPrice: priceRange[0]?.minPrice ?? 0,
       maxPrice: priceRange[0]?.maxPrice ?? 50000,
     });
@@ -50,6 +73,7 @@ router.get("/", async (req, res, next) => {
       maxPrice,
       minRating,
       stars,
+      meal,
       sortBy = "rating",
       sortOrder = "desc",
     } = req.query;
@@ -74,6 +98,7 @@ router.get("/", async (req, res, next) => {
 
     if (minRating) filter.rating = { $gte: Number(minRating) };
     if (stars) filter.stars = Number(stars);
+    if (meal) filter.mealPlan = meal;
 
     const sortField = ["rating", "price", "stars", "name", "city"].includes(
       sortBy

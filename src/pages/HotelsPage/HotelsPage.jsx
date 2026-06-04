@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import Layout from "../../components/layout/Layout/Layout";
+import { ru } from "../../constants/ru";
 import {
   loadHotels,
   loadHotelsMeta,
   defaultFilters,
 } from "../../store/slices/hotelsSlice";
-import HeroSection from "./components/HeroSection/HeroSection";
+import PageTitle from "./components/PageTitle/PageTitle";
 import SearchBar from "./components/SearchBar/SearchBar";
 import FilterPanel from "./components/FilterPanel/FilterPanel";
 import ResultsBar from "./components/ResultsBar/ResultsBar";
@@ -21,8 +22,8 @@ export default function HotelsPage() {
   }, [dispatch]);
 
   return (
-    <Layout mainLabel="Поиск отелей">
-      <HeroSection />
+    <Layout mainLabel={ru.hotels.title}>
+      <PageTitle />
       <SearchBar />
       <FilterPanel />
       <ResultsBar />

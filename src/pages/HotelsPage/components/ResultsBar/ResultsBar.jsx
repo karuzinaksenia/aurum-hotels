@@ -8,9 +8,12 @@ export default function ResultsBar() {
   if (listStatus !== "succeeded") return null;
 
   const activeTags = [];
+  if (filters.city) activeTags.push(filters.city);
+  else if (filters.country) activeTags.push(filters.country);
+  else if (filters.q?.trim()) activeTags.push(`«${filters.q.trim()}»`);
   if (filters.stars) activeTags.push(`${filters.stars} ★`);
   if (filters.minRating) activeTags.push(`${ru.filters.minRating}: ${filters.minRating}+`);
-  if (filters.city) activeTags.push(filters.city);
+  if (filters.meal) activeTags.push(`${ru.filters.meal}: ${filters.meal}`);
   if (filters.minPrice) activeTags.push(`от ${filters.minPrice} ₽`);
   if (filters.maxPrice) activeTags.push(`до ${filters.maxPrice} ₽`);
 

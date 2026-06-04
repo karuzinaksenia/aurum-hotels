@@ -20,7 +20,6 @@ export default function Header() {
       <Inner>
         <Brand to="/" aria-label={`${ru.brand} — главная`}>
           {ru.brand}
-          <span>{ru.brandTag}</span>
         </Brand>
         <Nav aria-label="Основная навигация">
           <NavLink to="/" end>

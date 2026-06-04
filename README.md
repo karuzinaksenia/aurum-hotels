@@ -1,20 +1,24 @@
 # Aurum Hotels
 
-Трёхстраничное SPA для бронирования отелей (курсовой проект).
+SPA для поиска отелей, бронирования и личного кабинета (курсовой проект).
 
 | Страница | Маршрут | Фича |
 |----------|---------|------|
-| Поиск отелей | `/` | Поиск и фильтрация через REST API |
-| Детали отеля | `/hotel/:id` | Форма бронирования → API + localStorage |
-| Мои брони | `/bookings` | Список и отмена бронирований |
+| Главная | `/` | Hero, избранные отели, о проекте |
+| Каталог | `/hotels` | Поиск, фильтры, подсказки через REST API |
+| Отель | `/hotels/:id` | Детали, бронирование, избранное |
+| Профиль | `/profile` | Брони, избранное (требует входа) |
+| Вход / регистрация | `/login`, `/register` | JWT-авторизация |
+
+Маршрут `/bookings` перенаправляет на `/profile`.
 
 ## Стек (требования курса)
 
-- **SPA:** React 18 + Vite + React Router (3 экрана)
+- **SPA:** React 18 + Vite + React Router
 - **REST API:** Express + MongoDB (Mongoose)
 - **State:** Redux Toolkit
 - **Стили:** Emotion (`@emotion/react`, `@emotion/styled`)
-- **localStorage:** кэш броней, недавние поиски
+- **localStorage:** токен, кэш броней, недавние поиски
 - **a11y:** семантическая разметка, skip-link, labels, `aria-*`
 
 ## Структура
@@ -27,6 +31,7 @@ src/
   services/       # api.js, storage.js
   styles/         # theme, GlobalStyles
 server/           # Express + MongoDB
+render.yaml       # Blueprint для Render (API + static web)
 ```
 
 ## Локальный запуск
@@ -55,32 +60,36 @@ npm run dev
 
 ## Деплой на GitHub + Render (не localhost)
 
-1. Создайте репозиторий на GitHub и запушьте проект:
+Репозиторий: https://github.com/karuzinaksenia/aurum-hotels
 
-```bash
-git init
-git add .
-git commit -m "Aurum Hotels SPA"
-git remote add origin https://github.com/YOUR_USER/aurum-hotels.git
-git push -u origin main
-```
+1. Запушьте `main` на GitHub (в репозитории должен быть `render.yaml`).
 
-2. [MongoDB Atlas](https://www.mongodb.com/atlas) — бесплатный кластер, скопируйте connection string.
+2. **MongoDB Atlas** — бесплатный M0, connection string в `MONGODB_URI`.
 
-3. [Render](https://render.com) → **New Blueprint** → подключите репозиторий → используйте `render.yaml`.
+3. **Render** → **New Blueprint** → подключите репозиторий → Blueprint подхватит `render.yaml`.
 
-4. В Render задайте переменные:
-   - **API** `aurum-hotels-api`: `MONGODB_URI`, `CLIENT_ORIGIN` = URL статики (например `https://aurum-hotels-web.onrender.com`)
-   - **Web** `aurum-hotels-web`: `VITE_API_URL` = `https://aurum-hotels-api.onrender.com/api`
+4. Переменные окружения (порядок важен — см. чеклист в ответе агента или ниже кратко):
+   - **API** `aurum-hotels-api`: `MONGODB_URI`, `JWT_SECRET`, затем `CLIENT_ORIGIN` = URL статики
+   - **Web** `aurum-hotels-web`: `VITE_API_URL` = `https://<имя-api>.onrender.com/api` (после первого деплоя API)
 
-5. После деплоя откройте URL статического сервиса — это публичный адрес для сдачи.
+5. Публичная ссылка для сдачи — URL статического сервиса, например `https://aurum-hotels-web.onrender.com`.
+
+Подробный пошаговый чеклист (Atlas + Render + порядок env) — в документации к деплою в чате / у преподавателя.
 
 ## API
 
 | Method | Endpoint | Описание |
 |--------|----------|----------|
-| GET | `/api/hotels` | Список (`?q`, `?city`, `?maxPrice`) |
+| GET | `/api/health` | Проверка API |
+| POST | `/api/auth/register` | Регистрация |
+| POST | `/api/auth/login` | Вход |
+| GET | `/api/auth/me` | Текущий пользователь (Bearer) |
+| GET | `/api/hotels` | Список (`?q`, `?city`, фильтры) |
+| GET | `/api/hotels/meta` | Мета для фильтров |
 | GET | `/api/hotels/:id` | Отель |
+| GET | `/api/favorites` | Избранное (auth) |
+| POST | `/api/favorites/:hotelId` | Добавить в избранное |
+| DELETE | `/api/favorites/:hotelId` | Убрать из избранного |
 | GET | `/api/bookings` | Брони |
 | POST | `/api/bookings` | Создать бронь |
 | DELETE | `/api/bookings/:id` | Отменить |
@@ -88,5 +97,5 @@ git push -u origin main
 ## Скрипты
 
 - `npm run dev` — фронт + бэкенд
-- `npm run build` — сборка SPA
-- `npm start` — только API (production)
+- `npm run build` — сборка SPA (`VITE_API_URL` подставляется на этапе build)
+- `npm start` — только API (production на Render)

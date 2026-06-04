@@ -5,6 +5,7 @@ import Layout from "../../components/layout/Layout/Layout";
 import { loadHotels } from "../../store/slices/hotelsSlice";
 import { ru } from "../../constants/ru";
 import HomeHero from "./components/HomeHero/HomeHero";
+import AboutSection from "./components/AboutSection/AboutSection";
 import FeaturedHotels from "./components/FeaturedHotels/FeaturedHotels";
 
 export default function HomePage() {
@@ -23,6 +24,7 @@ export default function HomePage() {
     <Layout mainLabel="Главная страница">
       <HomeHero />
       <FeaturedHotels hotels={featured} loading={listStatus === "loading"} />
+      <AboutSection />
       <p style={{ textAlign: "center", marginTop: 32 }}>
         <Link to="/hotels">{ru.home.cta} →</Link>
       </p>

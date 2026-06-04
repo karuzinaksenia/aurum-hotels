@@ -1,61 +1,140 @@
+import { useEffect, useId, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Input from "../../../../components/ui/Input/Input";
 import Button from "../../../../components/ui/Button/Button";
-import { setFilters, loadHotels } from "../../../../store/slices/hotelsSlice";
-import { getRecentSearches } from "../../../../services/storage";
 import { ru } from "../../../../constants/ru";
-import { Form, RecentWrap, RecentLabel, Chip } from "./SearchBar.styles";
+import { getRecentSearches } from "../../../../services/storage";
+import {
+  setFilters,
+  loadHotels,
+  loadHotelsMeta,
+} from "../../../../store/slices/hotelsSlice";
+import SuggestionList from "./SuggestionList";
+import {
+  buildSuggestions,
+  filtersFromSuggestion,
+  filtersFromText,
+  getSearchDisplayValue,
+} from "./searchUtils";
+import {
+  Form,
+  SearchRow,
+  Combobox,
+  Field,
+  Label,
+  TextInput,
+  RecentBlock,
+  RecentLabel,
+  Chips,
+  Chip,
+} from "./SearchBar.styles";
 
 export default function SearchBar() {
   const dispatch = useDispatch();
   const filters = useSelector((s) => s.hotels.filters);
-  const recent = getRecentSearches();
+  const meta = useSelector((s) => s.hotels.meta);
+  const listId = useId();
+  const comboboxRef = useRef(null);
 
-  function update(field, value) {
-    dispatch(setFilters({ [field]: value }));
+  const [input, setInput] = useState(() => getSearchDisplayValue(filters));
+  const [open, setOpen] = useState(false);
+  const [recent, setRecent] = useState(() => getRecentSearches());
+
+  const suggestions = buildSuggestions(input, meta);
+  const showSuggestions = open && input.trim().length > 0 && suggestions.length > 0;
+
+  useEffect(() => {
+    setInput(getSearchDisplayValue(filters));
+  }, [filters.q, filters.city, filters.country]);
+
+  useEffect(() => {
+    function handlePointerDown(e) {
+      if (comboboxRef.current && !comboboxRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handlePointerDown);
+    return () => document.removeEventListener("mousedown", handlePointerDown);
+  }, []);
+
+  function runSearch(location) {
+    const next = { ...filters, ...location };
+    dispatch(setFilters(location));
+    dispatch(loadHotels(next));
+    setRecent(getRecentSearches());
+    if (location.country) {
+      dispatch(loadHotelsMeta({ country: location.country }));
+    } else if (!location.city) {
+      dispatch(loadHotelsMeta());
+    }
+    setOpen(false);
   }
 
   function handleSubmit(e) {
     e.preventDefault();
-    dispatch(loadHotels(filters));
+    runSearch(filtersFromText(input));
   }
 
-  function applyRecent(term) {
-    const next = { ...filters, q: term };
-    dispatch(setFilters({ q: term }));
-    dispatch(loadHotels(next));
+  function handleSelectSuggestion(suggestion) {
+    setInput(suggestion.label);
+    runSearch(filtersFromSuggestion(suggestion));
+  }
+
+  function handleRecentClick(term) {
+    setInput(term);
+    runSearch(filtersFromText(term));
   }
 
   return (
-    <>
-      <Form onSubmit={handleSubmit} aria-label="Поиск отелей">
-        <Input
-          label={ru.hotels.search}
-          name="q"
-          placeholder={ru.hotels.searchPlaceholder}
-          value={filters.q}
-          onChange={(e) => update("q", e.target.value)}
-        />
-        <Input
-          label={ru.hotels.city}
-          name="city"
-          placeholder={ru.hotels.cityPlaceholder}
-          value={filters.city}
-          onChange={(e) => update("city", e.target.value)}
-        />
+    <Form onSubmit={handleSubmit} aria-label="Поиск отелей">
+      <SearchRow>
+        <Combobox ref={comboboxRef}>
+          <Field>
+            <Label htmlFor="hotel-search">{ru.hotels.search}</Label>
+            <TextInput
+              id="hotel-search"
+              name="q"
+              type="search"
+              autoComplete="off"
+              role="combobox"
+              aria-expanded={showSuggestions}
+              aria-controls={showSuggestions ? listId : undefined}
+              aria-autocomplete="list"
+              placeholder={ru.hotels.searchPlaceholder}
+              value={input}
+              onChange={(e) => {
+                setInput(e.target.value);
+                setOpen(true);
+              }}
+              onFocus={() => setOpen(true)}
+            />
+          </Field>
+          {showSuggestions && (
+            <SuggestionList
+              listId={listId}
+              suggestions={suggestions}
+              onSelect={handleSelectSuggestion}
+            />
+          )}
+        </Combobox>
         <Button type="submit">{ru.hotels.submit}</Button>
-      </Form>
+      </SearchRow>
 
       {recent.length > 0 && (
-        <RecentWrap>
+        <RecentBlock>
           <RecentLabel>{ru.hotels.recent}</RecentLabel>
-          {recent.map((term) => (
-            <Chip key={term} type="button" onClick={() => applyRecent(term)}>
-              {term}
-            </Chip>
-          ))}
-        </RecentWrap>
+          <Chips>
+            {recent.map((term) => (
+              <Chip
+                key={term}
+                type="button"
+                onClick={() => handleRecentClick(term)}
+              >
+                {term}
+              </Chip>
+            ))}
+          </Chips>
+        </RecentBlock>
       )}
-    </>
+    </Form>
   );
 }

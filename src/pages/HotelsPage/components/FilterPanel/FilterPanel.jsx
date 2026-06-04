@@ -45,8 +45,6 @@ export default function FilterPanel() {
   const dispatch = useDispatch();
   const filters = useSelector((s) => s.hotels.filters);
   const meta = useSelector((s) => s.hotels.meta);
-  const countries = meta?.countries || [];
-  const cities = meta?.cities || [];
 
   function update(field, value) {
     dispatch(setFilters({ [field]: value }));
@@ -67,20 +65,6 @@ export default function FilterPanel() {
     dispatch(setFilters({ sortBy, sortOrder }));
   }
 
-  function pickCountry(country) {
-    const nextCountry = filters.country === country ? "" : country;
-    const next = { ...filters, country: nextCountry, city: "" };
-    dispatch(setFilters({ country: nextCountry, city: "" }));
-    dispatch(loadHotelsMeta(nextCountry ? { country: nextCountry } : {}));
-    apply(next);
-  }
-
-  function pickCity(city) {
-    const next = { ...filters, city: filters.city === city ? "" : city };
-    dispatch(setFilters({ city: next.city }));
-    apply(next);
-  }
-
   const sortValue = buildSortValue(filters.sortBy, filters.sortOrder);
   const safeSortValue = SORT_OPTIONS.some((o) => o.value === sortValue)
     ? sortValue
@@ -89,52 +73,6 @@ export default function FilterPanel() {
   return (
     <Panel aria-labelledby="filters-title">
       <PanelTitle id="filters-title">{ru.filters.title}</PanelTitle>
-
-      <FilterGroup>
-        <GroupLabel>{ru.filters.country}</GroupLabel>
-        <Chips>
-          <Chip
-            type="button"
-            $active={!filters.country}
-            onClick={() => pickCountry("")}
-          >
-            {ru.filters.allCountries}
-          </Chip>
-          {countries.map((country) => (
-            <Chip
-              key={country}
-              type="button"
-              $active={filters.country === country}
-              onClick={() => pickCountry(country)}
-            >
-              {country}
-            </Chip>
-          ))}
-        </Chips>
-      </FilterGroup>
-
-      <FilterGroup>
-        <GroupLabel>{ru.filters.city}</GroupLabel>
-        <Chips>
-          <Chip
-            type="button"
-            $active={!filters.city}
-            onClick={() => pickCity("")}
-          >
-            {ru.filters.allCities}
-          </Chip>
-          {cities.map((city) => (
-            <Chip
-              key={city}
-              type="button"
-              $active={filters.city === city}
-              onClick={() => pickCity(city)}
-            >
-              {city}
-            </Chip>
-          ))}
-        </Chips>
-      </FilterGroup>
 
       <Row>
         <FilterGroup>
@@ -179,6 +117,31 @@ export default function FilterPanel() {
               </option>
             ))}
           </Select>
+        </FilterGroup>
+      </Row>
+
+      <Row>
+        <FilterGroup>
+          <GroupLabel>{ru.filters.meal}</GroupLabel>
+          <Chips>
+            <Chip
+              type="button"
+              $active={!filters.meal}
+              onClick={() => update("meal", "")}
+            >
+              {ru.filters.anyMeal}
+            </Chip>
+            {(meta?.meals ?? []).map((plan) => (
+              <Chip
+                key={plan}
+                type="button"
+                $active={filters.meal === plan}
+                onClick={() => update("meal", plan)}
+              >
+                {plan}
+              </Chip>
+            ))}
+          </Chips>
         </FilterGroup>
       </Row>
 

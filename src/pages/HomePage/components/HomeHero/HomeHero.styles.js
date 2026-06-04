@@ -10,36 +10,54 @@ export const Hero = styled.section`
   border-radius: ${theme.radii.xl};
   overflow: hidden;
   border: 1px solid ${theme.colors.border};
+`;
 
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(135deg, rgba(99, 102, 241, 0.2), transparent 50%),
-      linear-gradient(225deg, rgba(212, 168, 83, 0.15), transparent 55%),
-      url("https://picsum.photos/seed/aurum-russia-hero/1200/400") center /
-        cover;
-    opacity: 0.35;
-    z-index: 0;
-  }
+export const HeroContent = styled.div`
+  position: relative;
+  z-index: 1;
+`;
 
-  &::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to bottom,
-      rgba(7, 11, 20, 0.5),
-      rgba(7, 11, 20, 0.92)
-    );
-    z-index: 0;
-  }
+export const HeroCarousel = styled.div`
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+`;
 
-  > * {
-    position: relative;
-    z-index: 1;
+export const HeroSlide = styled.div`
+  position: absolute;
+  inset: 0;
+  background-image: url(${({ $src }) => $src});
+  background-position: center;
+  background-size: cover;
+  opacity: ${({ $active }) => ($active ? 0.35 : 0)};
+  transition: opacity 1.2s ease-in-out;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
   }
+`;
+
+export const HeroAccent = styled.div`
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(99, 102, 241, 0.2), transparent 50%),
+    linear-gradient(225deg, rgba(212, 168, 83, 0.15), transparent 55%);
+`;
+
+export const HeroOverlay = styled.div`
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(7, 11, 20, 0.5),
+    rgba(7, 11, 20, 0.92)
+  );
 `;
 
 export const Title = styled.h1`

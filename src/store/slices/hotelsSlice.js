@@ -14,6 +14,7 @@ export const defaultFilters = {
   maxPrice: "",
   stars: "",
   minRating: "",
+  meal: "",
   sortBy: "rating",
   sortOrder: "desc",
 };

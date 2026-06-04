@@ -1,15 +1,16 @@
 import styled from "@emotion/styled";
 import { theme } from "../../../../styles/theme";
 
-export const Hero = styled.section`
+export const Header = styled.header`
   text-align: center;
-  padding: 24px 0 40px;
+  padding: 32px 24px 8px;
+  margin-bottom: 28px;
 `;
 
 export const Title = styled.h1`
   font-family: ${theme.fonts.display};
-  font-size: clamp(2rem, 5vw, 3rem);
-  margin: 0 0 12px;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  margin: 0;
   background: linear-gradient(
     135deg,
     ${theme.colors.goldLight},
@@ -18,11 +19,4 @@ export const Title = styled.h1`
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-`;
-
-export const Subtitle = styled.p`
-  margin: 0 auto;
-  max-width: 520px;
-  color: ${theme.colors.textMuted};
-  font-size: 1.1rem;
 `;
