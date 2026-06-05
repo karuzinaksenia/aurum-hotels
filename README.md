@@ -1,6 +1,6 @@
 # Aurum Hotels
 
-SPA для поиска отелей, бронирования и личного кабинета (курсовой проект).
+SPA для поиска отелей, бронирования и личного кабинета.
 
 | Страница | Маршрут | Фича |
 |----------|---------|------|
@@ -12,7 +12,7 @@ SPA для поиска отелей, бронирования и личного
 
 Маршрут `/bookings` перенаправляет на `/profile`.
 
-## Стек (требования курса)
+## Стек 
 
 - **SPA:** React 18 + Vite + React Router
 - **REST API:** Express + MongoDB (Mongoose)
@@ -55,8 +55,3 @@ render.yaml       # Blueprint для Render (опционально)
 | POST | `/api/bookings` | Создать бронь |
 | DELETE | `/api/bookings/:id` | Отменить |
 
-## Скрипты
-
-- `npm run dev` — фронт + бэкенд
-- `npm run build` — сборка SPA (`VITE_API_URL` подставляется на этапе build)
-- `npm start` — только API (production на Render)
